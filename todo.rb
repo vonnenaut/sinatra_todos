@@ -16,13 +16,13 @@ get "/" do
   redirect "/lists"
 end
 
-# views all lists
+# Views all lists
 get "/lists" do
   @lists = session[:lists]
   erb :lists, layout: :layout
 end
 
-# Create a new to-do list
+# Retrieves the new list form
 get "/lists/new" do
   erb :new_list, layout: :layout
 end
@@ -43,6 +43,13 @@ def error_for_list_name(name)
   end
 end
 
+# 
+def error_for_todo(name)
+  if !(1..100).cover? name.size
+    "To-do must be between 1 and 100 characters."
+  end
+end
+
 # Creates a new list, verifying first that it's not without a name or using all space characters
 post "/lists" do
   list_name = params[:list_name].strip
@@ -60,10 +67,10 @@ end
 
 # Views a specific list and its tasks
 get "/lists/:id" do
-  @id = params[:id].to_i
-  @list = session[:lists][@id]
+  @list_id = params[:id].to_i
+  @list = session[:lists][@list_id]
 
-  if @id > session[:lists].length - 1
+  if @list_id > session[:lists].length - 1
     session[:error] = "That To-Do list doesn't exist."
     redirect "/lists"
   else
@@ -71,7 +78,7 @@ get "/lists/:id" do
   end
 end
 
-# updates an existing to-do list
+# Updates an existing to-do list
 post "/lists/:id" do
   list_name = params[:list_name].strip
   id = params[:id].to_i
@@ -88,10 +95,27 @@ post "/lists/:id" do
   end
 end
 
-# deletes an existing to-do list
+# Deletes an existing to-do list
 post "/lists/:id/destroy" do
   id = params[:id].to_i
   session[:lists].delete_at(id)
   session[:success] = "The list has been deleted."
   redirect "/lists"
+end
+
+# Adds a new to-do item to a to-do list
+post "/lists/:list_id/todos" do
+  @list_id = params[:list_id].to_i
+  @list = session[:lists][@list_id]
+  text = params[:todo].strip
+
+  error = error_for_todo(text)
+  if error
+    session[:error] = error
+    erb :list, layout: :layout
+  else
+    @list[:todos] << {name: text, completed: false}
+    session[:success] = "The to-do item was added."
+    redirect "/lists/#{@list_id}"
+  end
 end
