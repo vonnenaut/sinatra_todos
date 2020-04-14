@@ -22,15 +22,15 @@ get "/lists" do
   erb :lists, layout: :layout
 end
 
-# renders the new list form
+# Create a new to-do list
 get "/lists/new" do
   erb :new_list, layout: :layout
 end
 
-# renders the edit list form
+# Edit an existing to-do list
 get "/lists/:id/edit" do
-  list_id = params[:id].to_i
-  @name = session[:lists][list_id]
+  id = params[:id].to_i
+  @list = session[:lists][id]
   erb :edit_list, layout: :layout
 end
 
@@ -60,10 +60,10 @@ end
 
 # Views a specific list and its tasks
 get "/lists/:id" do
-  @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
+  @id = params[:id].to_i
+  @list = session[:lists][@id]
 
-  if @list_id > session[:lists].length - 1
+  if @id > session[:lists].length - 1
     session[:error] = "That To-Do list doesn't exist."
     redirect "/lists"
   else
@@ -71,3 +71,27 @@ get "/lists/:id" do
   end
 end
 
+# updates an existing to-do list
+post "/lists/:id" do
+  list_name = params[:list_name].strip
+  id = params[:id].to_i
+  @list = session[:lists][id]
+  
+  error = error_for_list_name(list_name)
+  if error
+    session[:error] = error
+    erb :edit_list, layout: :layout
+  else
+    @list[:name] = list_name
+    session[:success] = "The list name has been updated."
+    redirect "/lists/#{id}"
+  end
+end
+
+# deletes an existing to-do list
+post "/lists/:id/destroy" do
+  id = params[:id].to_i
+  session[:lists].delete_at(id)
+  session[:success] = "The list has been deleted."
+  redirect "/lists"
+end
