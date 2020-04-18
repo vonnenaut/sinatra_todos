@@ -132,8 +132,12 @@ end
 post "/lists/:id/destroy" do
   id = params[:id].to_i
   session[:lists].delete_at(id)
-  session[:success] = "The list has been deleted."
-  redirect "/lists"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:success] = "The list has been deleted."
+    redirect "/lists"
+  end
 end
 
 # Adds a new to-do item to a to-do list
@@ -160,8 +164,15 @@ post "/lists/:list_id/todos/:id/destroy" do
 
   todo_id = params[:id].to_i
   @list[:todos].delete_at todo_id
-  session[:success] = "The to-do item has been deleted."
-  redirect "/lists/#{@list_id}"
+
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    # ajax request
+    status 204
+  else
+    # request by standard form submission
+    session[:success] = "The to-do item has been deleted."
+    redirect "/lists/#{@list_id}"
+  end
 end
 
 # Marks an item from a to-do list as completed
