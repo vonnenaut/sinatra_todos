@@ -66,8 +66,13 @@ def error_for_todo(name)
   end
 end
 
+def next_todo_id(todos)
+  max = todos.map { |todo| todo[:id] }.max || 0
+  max + 1
+end
+
 def next_element_id(elements)
-  max = elements.map { |todo| todo[:id] }.max || 0
+  max = elements.map { |element| element[:id] }.max || 0
   max + 1
 end
 
