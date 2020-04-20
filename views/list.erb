@@ -13,21 +13,21 @@
   </header>
 
   <ul>
-    <% sort_todos(@list[:todos]) do |item| %>
-    <% if item[:completed] %>
-      <li class="complete">
-    <% else %>
-      <li>
-    <% end %>
-      <form action="/lists/<%= @list_id %>/todos/<%= item[:id] %>" method="post" class="check">
-        <input type="hidden" name="completed" value="<%= !item[:completed] %>" />
-        <button type="submit">Complete</button>
-      </form>
-      <h3><%= item[:name] %></h3>
-        <form action="/lists/<%= @list_id %>/todos/<%= item[:id] %>/destroy" method="post" class="delete">
+    <% sort_todos(@list[:todos]) do |todo| %>
+      <% if todo[:completed] %>
+        <li class="complete">
+      <% else %>
+        <li>
+      <% end %>
+        <form action="/lists/<%= @list_id %>/todos/<%= todo[:id] %>" method="post" class="check">
+          <input type="hidden" name="completed" value="<%= !todo[:completed] %>" />
+          <button type="submit">Complete</button>
+        </form>
+        <h3><%= todo[:name] %></h3>
+        <form action="/lists/<%= @list_id %>/todos/<%= todo[:id] %>/destroy" method="post" class="delete">
           <button type="submit">Delete</button>
         </form>
-    </li>
+      </li>
     <% end %>
   </ul>
 </section>
@@ -35,10 +35,10 @@
 <form action="/lists/<%= @list_id %>/todos" method="post">
   <dl>
     <dt>
-      <label for="todo">Enter a new to-do item:</label>
+      <label for="todo">Enter a new todo item:</label>
     </dt>
     <dd>
-      <input name="todo" id="todo" placeholder="Something to do" type="text" value="<%= params[:todo] %>">
+    <input name="todo" placeholder="Something to do" type="text" value="<%= params[:todo] %>">
     </dd>
   </dl>
   <fieldset class="actions">

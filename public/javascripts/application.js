@@ -1,4 +1,5 @@
 $(function() {
+
   $("form.delete").submit(function(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -19,9 +20,7 @@ $(function() {
           document.location = data;
         }
       });
-
-      // NOTE: should implement fail in production apps
-      // request.fail(function() {});
     }
   });
+
 });
