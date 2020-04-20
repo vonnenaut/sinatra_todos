@@ -10,27 +10,27 @@ configure do
 end
 
 helpers do
-  def list_complete?(list)
-    todos_count(list) > 0 && todos_remaining_count(list) == 0
+  def todos_count(todos)
+    todos.size
   end
 
-  def list_class(list)
-    "complete" if list_complete?(list)
+  def todos_remaining_count(todos)
+    todos.count { |todo| !todo[:completed] }
   end
 
-  def todos_count(list)
-    list[:todos].size
-  end
-
-  def todos_remaining_count(list)
-    list[:todos].count { |todo| !todo[:completed] }
+  def list_complete?(todos)
+    todos_count(todos) > 0 && todos_remaining_count(todos) == 0
   end
 
   def sort_lists(lists, &block)
-    complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
+    complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list[:todos]) }
 
     incomplete_lists.each(&block)
     complete_lists.each(&block)
+  end
+
+    def list_class(todos)
+    "complete" if list_complete?(todos)
   end
 
   def sort_todos(todos, &block)
@@ -47,7 +47,6 @@ def load_list(id)
 
   session[:error] = "The specified list was not found."
   redirect "/lists"
-  halt
 end
 
 # Return an error message if the name is invalid. Return nil if name is valid.
@@ -64,11 +63,6 @@ def error_for_todo(name)
   if !(1..100).cover? name.size
     "Todo must be between 1 and 100 characters."
   end
-end
-
-def next_todo_id(todos)
-  max = todos.map { |todo| todo[:id] }.max || 0
-  max + 1
 end
 
 def next_element_id(elements)
@@ -113,8 +107,11 @@ end
 
 # View a single todo list
 get "/lists/:id" do
-  @list_id = params[:id].to_i
-  @list = load_list(@list_id)
+  id = params[:id].to_i
+  list = load_list(id)
+  @list_name = list[:name]
+  @list_id = list[:id]
+  @todos = list[:todos]
   erb :list, layout: :layout
 end
 
