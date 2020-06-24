@@ -9,5 +9,5 @@ gem "rack", ">= 1.6.12"
 gem "rack-protection", ">= 1.5.5"
 
 group :production do
-  gem "puma"
+  gem "puma", "4.3.5"
 end
