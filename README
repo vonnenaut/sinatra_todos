@@ -1,1 +1,1 @@
-Sinatra app for Todo webapp
+A To-Do list web application written in Ruby using the Sinatra web framework and with session management as storage.
